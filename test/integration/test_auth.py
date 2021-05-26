@@ -1,28 +1,22 @@
+from unittest.case import TestCase
 from flask.wrappers import Response
 from werkzeug.wrappers import response
-import sys
-sys.path.append("/test/test_base")
-from test.test_base import BaseTest, db
+from main import app
+from website.__init__ import db
+
 from website.models import User
 from flask_login import current_user
 
-class TestSignUp(BaseTest):
-
-    # test signing up user successfully 
+class TestSignUp(TestCase):
     def test_sign_up_post_success(self):
-        with self.app:
-            # create a post req with valid data
-            response = self.app.post('/sign-up',
+        with app.test_client() as client:
+            response = client.post('/sign-up',
                                     data=dict(email='email@gmail.com', firstName='Namey', password1='pass1234', password2='pass1234'),
                                     follow_redirects=True)
-            # assert that new user is created in db
             user = db.session.query(User).filter_by(email='email@gmail.com').first()
             self.assertTrue(user)
-            # assert that flash message is shown
             self.assertIn(b'Account created', response.data)
-            # assert that user is logged in 
             self.assertEqual(current_user.get_id(), '1')
-            # assert that page is redirected
             self.assertIn(b'Notes', response.data)
     
     def test_sign_up_post_error(self):
