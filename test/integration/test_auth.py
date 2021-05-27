@@ -1,4 +1,4 @@
-from test.test_base import BaseTest
+from test_base import BaseTest
 import sys
 sys.path.append("website\__init__")
 from website.__init__ import db
